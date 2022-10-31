@@ -770,14 +770,16 @@ describe('JenkinsApi', () => {
       Verkar som att klienten inte finns/inte hittar trots att den borde få rätt url...
 
     */
-    const api_noMock = new JenkinsApiImpl();//useApi(jenkinsApiRef); //
+    //const api_noMock = new JenkinsApiImpl();//useApi(jenkinsApiRef); //
     const server = setupServer();
-    //setupRequestMockHandlers(server);
+    setupRequestMockHandlers(server);
     const baseUrl = 'https://jenkins.example.com';
     
     const setupHandlers = () => {
+      //const server = setupServer();
+      //setupRequestMockHandlers(server);
       server.use(
-        rest.get(`https://jenkins.example.com/job/example-jobName/job/exampleBuild`, (_, res, ctx) => { //behöver fixa url
+        rest.get(`https://jenkins.example.com/job/example-jobName/`, (_, res, ctx) => { //behöver fixa url
           return res(ctx.json({ result: project })); 
         }),
       );
@@ -789,14 +791,12 @@ describe('JenkinsApi', () => {
       );
       
     };
-    
+    /*
     it('getBuild with less mock', async () => {
-      console.log("-------------GET BUILD-----------")
-      console.log(setupHandlers());
-      console.log("-------------GET BUILD-----------")
+      setupHandlers();
 
       //const build_here = await api_noMock.getBuild(jenkinsInfo, jobFullName, buildNumber);    
-      const build_here = await jenkinsApi.getBuild(jenkinsInfo, jobFullName, buildNumber);    
+      const build_here = await jenkinsApi.getBuild(jenkinsInfo, jobFullName, buildNumber);     
 
       console.log(build_here);
       console.log(build_getbuild);
@@ -804,12 +804,18 @@ describe('JenkinsApi', () => {
       expect(build_here).toEqual(build_getbuild); //kommer vara fel...
 
     });
+    */
     // ------------------------------------------------------------------------
     it('getProjects unfiltired', async () => {
-      console.log("-------------GET PROJECTS-----------")
-      console.log(setupHandlers());
-      console.log("-------------GET PROJECTS-----------")
-
+      console.log("---------------------------------------------------");
+      setupHandlers();
+      /*
+      const jenkinsInfo: JenkinsInfo = {
+        baseUrl: 'https://jenkins.example.com',
+        headers: { headerName: 'headerValue' },
+        jobFullName: 'example-jobName',
+      };
+      */
       //const result = await api_noMock.getProjects(jenkinsInfo);
       const result = await jenkinsApi.getProjects(jenkinsInfo);
 
