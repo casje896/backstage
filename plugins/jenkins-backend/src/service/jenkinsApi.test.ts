@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-import { JenkinsApiImpl } from './jenkinsApi'; 
+import { JenkinsApiImpl } from './jenkinsApi';
 import jenkins from 'jenkins';
 import { JenkinsInfo } from './jenkinsInfoProvider';
 import { JenkinsBuild, JenkinsProject } from '../types';
 import { AuthorizeResult } from '@backstage/plugin-permission-common';
 import { NotAllowedError } from '@backstage/errors';
-import { jenkinsApiRef } from '../../../jenkins/src/api'; //'../../..jenkins/src/api';
-import { errorApiRef, useApi } from '@backstage/core-plugin-api';
-import { setupRequestMockHandlers } from '@backstage/backend-test-utils';
-import { rest } from 'msw';
-import { setupServer } from 'msw/node';
 
 jest.mock('jenkins');
 const mockedJenkinsClient = {
@@ -667,28 +662,7 @@ describe('JenkinsApi', () => {
     });
     expect(mockedJenkinsClient.job.build).toHaveBeenCalledWith(jobFullName);
   });
-  /*
-  it('buildProject without mocking', async () => {
-    //const localApi = useBuilds().useApi();
-    const api_noMock = new JenkinsApiImpl();//useApi(jenkinsApiRef);
-    
 
-    //await api.buildProject(jenkinsInfo, jobFullName, resourceRef);
-
-    //jenkins
-    //console.log(jenkins);
-
-    
-    expect(jenkins).toHaveBeenCalledWith({
-      baseUrl: jenkinsInfo.baseUrl,
-      headers: jenkinsInfo.headers,
-      promisify: true,
-    });
-    expect(mockedJenkinsClient.job.build).toHaveBeenCalledWith(jobFullName);
-    
-
-  });
-  */
   it('buildProject should fail if it does not have required permissions', async () => {
     fakePermissionApi.authorize.mockResolvedValueOnce([
       {
@@ -729,121 +703,4 @@ describe('JenkinsApi', () => {
     });
     expect(mockedJenkinsClient.job.build).toHaveBeenCalledWith(jobFullName);
   });
-
-  describe('JenkinsApi with less mock', () => {
-
-
-    //----------- allt detta bör nog ligga i en egen describe --------------
-    
-    const project: JenkinsProject = {
-      actions: [],
-      displayName: 'Example Build',
-      fullDisplayName: 'Example jobName » Example Build',
-      fullName: 'example-jobName/exampleBuild',
-      inQueue: false,
-      lastBuild: {
-        actions: [],
-        timestamp: 1,
-        building: false,
-        duration: 10,
-        result: 'success',
-        displayName: '#7',
-        fullDisplayName: 'Example jobName » Example Build #7',
-        url: 'https://jenkins.example.com/job/example-jobName/job/exampleBuild',
-        number: 7,
-      },
-    };
-    const build_getbuild: JenkinsBuild = {
-      actions: [],
-      timestamp: 1,
-      building: false,
-      duration: 10,
-      result: 'success',
-      fullDisplayName: 'example-jobName/exampleBuild',
-      displayName: 'exampleBuild',
-      url: `https://jenkins.example.com/job/example-jobName/job/exampleBuild/build/${buildNumber}`,
-      number: buildNumber,
-    };
-    /*
-      Problem: Har inget sätt att skicka upp till klienten det som ska hämtas i testerna.
-      Det skulle kunna vara att välja korrekt url. 
-      Verkar som att klienten inte finns/inte hittar trots att den borde få rätt url...
-
-    */
-    const api_noMock = new JenkinsApiImpl(fakePermissionApi);//useApi(jenkinsApiRef); //
-    const server = setupServer();
-    setupRequestMockHandlers(server);
-    const baseUrl = 'https://jenkins.example.com';
-    
-    const setupHandlers = () => {
-      //const server = setupServer();
-      //setupRequestMockHandlers(server);
-      server.use(
-        rest.get(`https://jenkins.example.com/job/example-jobName/`, (_, res, ctx) => { //behöver fixa url
-          return res(ctx.json({ result: [project] })); 
-        }),
-      );
-
-      server.use(
-        rest.get(`https://jenkins.example.com/job/example-jobName/job/exampleBuild/build/${buildNumber}`, (_, res, ctx) => { //behöver fixa url
-          return res(ctx.json({ result: build_getbuild })); 
-        }),
-      );
-      
-    };
-    /*
-    it('getBuild with less mock', async () => {
-      setupHandlers();
-
-      //const build_here = await api_noMock.getBuild(jenkinsInfo, jobFullName, buildNumber);    
-      const build_here = await jenkinsApi.getBuild(jenkinsInfo, jobFullName, buildNumber);     
-
-      console.log(build_here);
-      console.log(build_getbuild);
-      
-      expect(build_here).toEqual(build_getbuild); //kommer vara fel...
-
-    });
-    */
-    // ------------------------------------------------------------------------
-    it('getProjects unfiltired', async () => {
-      console.log("---------------------------------------------------");
-      setupHandlers();
-      /*
-      const jenkinsInfo: JenkinsInfo = {
-        baseUrl: 'https://jenkins.example.com',
-        headers: { headerName: 'headerValue' },
-        jobFullName: 'example-jobName',
-      };
-      */
-      const result = await api_noMock.getProjects(jenkinsInfo);
-      //const result = await jenkinsApi.getProjects(jenkinsInfo)  
-
-      expect(result).toHaveLength(1);
-      expect(result[0]).toEqual({
-        actions: [],
-        displayName: 'Example Build',
-        fullDisplayName: 'Example jobName » Example Build',
-        fullName: 'example-jobName/exampleBuild',
-        inQueue: false,
-        lastBuild: {
-          actions: [],
-          timestamp: 1,
-          building: false,
-          duration: 10,
-          result: 'success',
-          displayName: '#7',
-          fullDisplayName: 'Example jobName » Example Build #7',
-          url: 'https://jenkins.example.com/job/example-jobName/job/exampleBuild',
-          number: 7,
-          status: 'success',
-          source: {},
-        },
-        status: 'success',
-      });
-    });
-    
-  });
-  
-  
 });
