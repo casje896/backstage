@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { JenkinsApiImpl } from './jenkinsApi';
+import { JenkinsApiImpl } from './jenkinsApi'; 
 import jenkins from 'jenkins';
 import { JenkinsInfo } from './jenkinsInfoProvider';
 import { JenkinsBuild, JenkinsProject } from '../types';
@@ -730,7 +730,7 @@ describe('JenkinsApi', () => {
     expect(mockedJenkinsClient.job.build).toHaveBeenCalledWith(jobFullName);
   });
 
-  describe('JenkinsApi_noMock', () => {
+  describe('JenkinsApi with less mock', () => {
 
 
     //----------- allt detta bör nog ligga i en egen describe --------------
@@ -770,7 +770,7 @@ describe('JenkinsApi', () => {
       Verkar som att klienten inte finns/inte hittar trots att den borde få rätt url...
 
     */
-    //const api_noMock = new JenkinsApiImpl();//useApi(jenkinsApiRef); //
+    const api_noMock = new JenkinsApiImpl(fakePermissionApi);//useApi(jenkinsApiRef); //
     const server = setupServer();
     setupRequestMockHandlers(server);
     const baseUrl = 'https://jenkins.example.com';
@@ -780,7 +780,7 @@ describe('JenkinsApi', () => {
       //setupRequestMockHandlers(server);
       server.use(
         rest.get(`https://jenkins.example.com/job/example-jobName/`, (_, res, ctx) => { //behöver fixa url
-          return res(ctx.json({ result: project })); 
+          return res(ctx.json({ result: [project] })); 
         }),
       );
 
@@ -816,8 +816,8 @@ describe('JenkinsApi', () => {
         jobFullName: 'example-jobName',
       };
       */
-      //const result = await api_noMock.getProjects(jenkinsInfo);
-      const result = await jenkinsApi.getProjects(jenkinsInfo);
+      const result = await api_noMock.getProjects(jenkinsInfo);
+      //const result = await jenkinsApi.getProjects(jenkinsInfo)  
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
