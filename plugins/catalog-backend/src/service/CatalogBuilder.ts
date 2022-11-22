@@ -81,7 +81,6 @@ import {
   permissionRules as catalogPermissionRules,
 } from '../permissions/rules';
 import {
-  PermissionAuthorizer,
   PermissionEvaluator,
   toPermissionEvaluator,
 } from '@backstage/plugin-permission-common';
@@ -103,7 +102,7 @@ export type CatalogEnvironment = {
   database: PluginDatabaseManager;
   config: Config;
   reader: UrlReader;
-  permissions: PermissionEvaluator | PermissionAuthorizer;
+  permissions: PermissionEvaluator;
 };
 
 /**
