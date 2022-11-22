@@ -79,7 +79,6 @@ export class JenkinsApiImpl {
   async getProjects(jenkinsInfo: JenkinsInfo, branches?: string[]) {
     const client = await JenkinsApiImpl.getClient(jenkinsInfo);
     const projects: BackstageProject[] = [];
-    console.log("hello there");
     if (branches) {
       // Assume jenkinsInfo.jobFullName is a folder which contains one job per branch.
       // TODO: extract a strategy interface for this
@@ -95,7 +94,7 @@ export class JenkinsApiImpl {
     } else {
       // We aren't filtering
       // Assume jenkinsInfo.jobFullName is a folder which contains one job per branch.
-      console.log("Hi again");
+      console.log('Hi again');
       const folder = await client.job.get({
         name: jenkinsInfo.jobFullName,
         // Filter only be the information we need, instead of loading all fields.
