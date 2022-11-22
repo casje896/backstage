@@ -94,7 +94,7 @@ export class JenkinsApiImpl {
     } else {
       // We aren't filtering
       // Assume jenkinsInfo.jobFullName is a folder which contains one job per branch.
-      console.log('Hi again');
+
       const folder = await client.job.get({
         name: jenkinsInfo.jobFullName,
         // Filter only be the information we need, instead of loading all fields.
